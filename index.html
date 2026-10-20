@@ -73,7 +73,7 @@ const CATS=['Vêtements','Chaussures','Montres & bijoux','Électronique','Photos
 const ST={new:'🆕 Nouvelle',paid:'✅ Payée',delivered:'🚚 Livrée',cancelled:'✖ Annulée'};
 const link=s=>location.href.split('#')[0]+'#/s/'+s;
 const rs=(f,m,q)=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,m/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',q))};i.src=URL.createObjectURL(f)});
-let U=null,SH=null,tab='orders',busy=0,dp,ED=null,PH=[],PL=[],OR=[],LOGO,STO=null,cart={},fc='',fq='',AS=[],AO=[],GC={},tp=0,tl=0;
+let LE=null,U=null,SH=null,tab='orders',busy=0,dp,ED=null,PH=[],PL=[],OR=[],LOGO,STO=null,cart={},fc='',fq='',AS=[],AO=[],GC={},tp=0,tl=0;
 const prods=async s=>(await getDocs(query(collection(db,'products'),where('slug','==',s)))).docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.created-a.created);
 async function load(){SH=null;if(U&&U.email!==ADM){const q=await getDocs(query(collection(db,'shops'),where('uid','==',U.uid)));if(q.docs[0])SH={id:q.docs[0].id,...q.docs[0].data()}}}
 const modal=h=>{$('#modal').innerHTML='<div class="mb">'+h+'</div>';$('#modal').hidden=false};const close=()=>{$('#modal').hidden=true};
@@ -91,7 +91,7 @@ async function adminLogin(){const c=prompt('🔐 Code secret administrateur');if
  busy=0;U=auth.currentUser;SH=null;location.hash='#/admin';route()}
 
 /* ---------- routeur ---------- */
-onAuthStateChanged(auth,async u=>{if(busy)return;U=u;await load();route()});
+onAuthStateChanged(auth,async u=>{if(busy)return;U=u;LE=null;try{await load()}catch(e){LE=e}route()});
 addEventListener('hashchange',route);
 async function route(){const p=location.hash.slice(1).split('/').filter(Boolean);scrollTo(0,0);close();
  if(p[0]=='s')return store(p[1]);if(p[0]=='o')return order(p[1]);if(p[0]=='admin')return admin();
@@ -110,8 +110,10 @@ function signup(){view(`<div class="form"><img class="logo tap10" src="icon-192.
 const aerr=e=>({'auth/invalid-credential':'Numéro ou mot de passe incorrect.','auth/email-already-in-use':'Ce numéro a déjà un compte.','auth/weak-password':'Mot de passe trop court.','auth/network-request-failed':'Pas de connexion internet.'}[e.code]||'Erreur : '+(e.code||e.message));
 
 /* ---------- espace vendeur ---------- */
-async function dash(){if(!SH){view('<div class="load">Chargement…</div>');await load()}
- if(!SH)return view(`<div class="center"><img class="logo" src="icon-192.png"><h2>Aucune boutique trouvée</h2><p>Contactez Joseph Monsemvula.</p><a class="btn wa" href="${wl(WA)}" target="_blank" rel="noopener">💬 WhatsApp</a><button class="link" data-a="out">Se déconnecter</button></div>`,'hero');
+const fatal=e=>view(`<div class="center"><img class="logo tap10" src="icon-192.png"><h2>⚠️ Base de données inaccessible</h2><p>${e.code=='permission-denied'?'Les règles de sécurité Firebase ne sont pas encore publiées ou sont incorrectes. Dans Firebase : Firestore Database → Règles → collez le fichier ETAPE-1-REGLES-FIREBASE.txt → Publier.':'Vérifiez votre connexion internet puis réessayez.'}</p><small>Code : ${E(e.code||e.message)}</small><button class="btn gold" data-a="retry">🔄 Réessayer</button><button class="link" data-a="out">Se déconnecter</button></div>`,'hero');
+const mk=async(n,sn,ph)=>{let slug=slugify(sn)||'boutique';if((await getDoc(doc(db,'shops',slug))).exists())slug+='-'+Math.random().toString(36).slice(2,5);await setDoc(doc(db,'shops',slug),{uid:U.uid,owner:n,phone:ph,ph9:ph.slice(-9),name:sn,desc:'',status:'pending',cpaid:0,cur:'FC',color:'#2563eb',dark:0,font:'m',pay:{},wa:ph,created:Date.now()})};
+async function dash(){if(LE)return fatal(LE);if(!SH){view('<div class="load">Chargement…</div>');try{await load()}catch(e){return fatal(e)}}
+ if(!SH)return view(`<div class="center"><img class="logo" src="icon-192.png"><h2>Finalisez votre boutique</h2><p>Votre compte existe mais la boutique n’a pas été créée.</p><input id="nn" placeholder="Votre nom complet"><input id="ns" placeholder="Nom de votre boutique"><button class="btn gold" data-a="mkshop">Créer ma boutique</button><button class="link" data-a="out">Se déconnecter</button></div>`,'hero');
  if(SH.status!='active')return view(`<div class="center"><img class="logo tap10" src="icon-192.png"><h2>${SH.status=='blocked'?'Boutique suspendue':'Compte en attente d’autorisation'}</h2><p>${SH.status=='blocked'?'Votre boutique est suspendue. Contactez Joseph Monsemvula.':'Bienvenue '+E(SH.owner)+' ! Contactez Joseph Monsemvula : il vous donnera un code d’accès à 4 chiffres pour activer votre boutique.'}</p><a class="btn wa" href="${wl(WA,'Bonjour Joseph, je suis '+SH.owner+' ('+SH.phone+'), boutique '+SH.name+'. Je demande mon code d’accès JOSSELL SHOP.')}" target="_blank" rel="noopener">💬 Contacter Joseph</a>${SH.status=='pending'?'<input id="ac" maxlength="4" inputmode="numeric" placeholder="Code à 4 chiffres" style="text-align:center;font-size:22px"><button class="btn gold" data-a="act">Activer ma boutique</button>':''}<button class="link" data-a="out">Se déconnecter</button></div>`,'hero');
  view(`<header class="top"><div class="row"><img class="lg2" src="${SH.logo||'icon-192.png'}"><b>${E(SH.name)}</b></div><button class="ic" data-a="out">⏻</button></header><div id="body"></div><nav class="nav">${[['orders','🛍️','Commandes'],['prods','📦','Produits'],['shop','🏪','Boutique'],['link','🔗','Mon lien']].map(t=>`<button data-a="tab" data-k="${t[0]}"><i>${t[1]}</i>${t[2]}</button>`).join('')}</nav>`);tabRender()}
 async function tabRender(){const b=$('#body');if(!b)return;b.innerHTML='<div class="load">Chargement…</div>';try{b.innerHTML=await({orders:tOrders,prods:tProducts,shop:tShop,link:tLink}[tab])()}catch(e){b.innerHTML='<div class="empty">'+(e.code=='permission-denied'?'Publiez d’abord les règles Firebase (voir ETAPE-1).':'Erreur : '+E(e.code||e.message))+'</div>'}$$('.nav button').forEach(x=>x.classList.toggle('on',x.dataset.k==tab))}
@@ -136,7 +138,7 @@ const ck=()=>'cart_'+STO.id,csave=()=>{try{localStorage[ck()]=JSON.stringify(car
 const cinfo=()=>{const L=Object.entries(cart).map(([id,q])=>({p:PL.find(x=>x.id==id),q})).filter(x=>x.p);return{L,n:L.reduce((a,x)=>a+x.q,0),T:L.reduce((a,x)=>a+x.p.price*x.q,0)}};
 async function store(slug){view('<div class="load">Chargement…</div>');let s;try{s=await getDoc(doc(db,'shops',slug||'_'))}catch{}
  if(!s||!s.exists()||s.data().status!='active')return view('<div class="center"><img class="logo" src="icon-192.png"><h2>Boutique indisponible</h2><p>Ce lien est invalide ou la boutique est temporairement fermée.</p><a class="btn gold" href="#/">Créer ma boutique</a></div>','hero');
- STO={id:s.id,...s.data()};PL=(await prods(slug)).filter(p=>!p.hide);fc='';fq='';try{cart=JSON.parse(localStorage[ck()]||'{}')}catch{cart={}};sv()}
+ STO={id:s.id,...s.data()};try{PL=(await prods(slug)).filter(p=>!p.hide)}catch(e){return fatal(e)}fc='';fq='';try{cart=JSON.parse(localStorage[ck()]||'{}')}catch{cart={}};sv()}
 function sv(){const s=STO,c=cinfo(),list=PL.filter(p=>(!fc||p.cat==fc)&&(!fq||p.name.toLowerCase().includes(fq))),cats=[...new Set(PL.map(p=>p.cat))];
  view(`<div class="st-w" style="${th(s)}"><div class="sh">${s.logo?`<img src="${s.logo}">`:''}<div><h1>${E(s.name)}</h1><p>${E(s.desc)}</p></div></div><div class="bar"><input id="fq" placeholder="🔍 Rechercher un produit" value="${E(fq)}"></div>
  <div class="chips"><button class="chip ${fc?'':'on'}" data-a="fc" data-k="">Tout</button>${cats.map(x=>`<button class="chip ${fc==x?'on':''}" data-a="fc" data-k="${E(x)}">${E(x)}</button>`).join('')}</div>
@@ -153,7 +155,7 @@ async function order(id){view('<div class="load">Chargement…</div>');let o;try
 
 /* ---------- administration ---------- */
 async function admin(){if(!U||U.email!=ADM){location.hash='#/';return}
- view('<div class="load">Chargement…</div>');const[S,O]=await Promise.all([getDocs(collection(db,'shops')),getDocs(collection(db,'orders'))]);
+ view('<div class="load">Chargement…</div>');let S,O;try{[S,O]=await Promise.all([getDocs(collection(db,'shops')),getDocs(collection(db,'orders'))])}catch(e){return fatal(e)}
  AS=S.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.created-a.created);AO=O.docs.map(d=>({id:d.id,...d.data()}));ar()}
 function stat(s){const o=AO.filter(x=>x.slug==s.id&&x.status!='cancelled'),c=sum(o,'commission');return{n:o.length,sales:sum(o,'total'),com:c,due:Math.max(0,c-(s.cpaid||0))}}
 function ar(){const cur={};AS.forEach(s=>{const t=stat(s),c=cur[s.cur]||(cur[s.cur]={sales:0,com:0,paid:0,due:0});c.sales+=t.sales;c.com+=t.com;c.paid+=s.cpaid||0;c.due+=t.due});
@@ -164,13 +166,14 @@ function ar(){const cur={};AS.forEach(s=>{const t=stat(s),c=cur[s.cur]||(cur[s.c
 
 /* ---------- actions ---------- */
 const A={
+ retry:async()=>{LE=null;try{await load()}catch(e){LE=e}route()},
+ mkshop:async()=>{const n=v('nn'),sn=v('ns');if(!n||!sn)return toast('Nom et boutique obligatoires');await mk(n,sn,U.email.split('@')[0]);await load();route()},
  inst:async()=>{if(!dp)return;dp.prompt();const r=await dp.userChoice;dp=null;if(r.outcome=='accepted')document.body.classList.remove('canin')},
  out:async()=>{await signOut(auth);U=null;SH=null;location.hash='#/';route()},
  close,
  dologin:async()=>{try{await signInWithEmailAndPassword(auth,norm(v('lph'))+DOM,$('#lpw').value);location.hash='#/'}catch(e){toast(aerr(e))}},
  dosignup:async()=>{const n=v('gn'),sn=v('gs'),ph=norm(v('gp')),pw=$('#gw').value;if(!n||!sn)return toast('Nom et boutique obligatoires');if(ph.length<11)return toast('Numéro invalide');if(pw.length<6)return toast('Mot de passe : 6 caractères minimum');if(!$('#gt').checked)return toast('Veuillez accepter les conditions');
-  busy=1;try{const c=await createUserWithEmailAndPassword(auth,ph+DOM,pw);U=c.user;let slug=slugify(sn)||'boutique';if((await getDoc(doc(db,'shops',slug))).exists())slug+='-'+Math.random().toString(36).slice(2,5);
-   await setDoc(doc(db,'shops',slug),{uid:U.uid,owner:n,phone:ph,ph9:ph.slice(-9),name:sn,desc:'',status:'pending',cpaid:0,cur:'FC',color:'#2563eb',dark:0,font:'m',pay:{},wa:ph,created:Date.now()});await load();busy=0;location.hash='#/';route()}catch(e){busy=0;toast(aerr(e))}},
+  busy=1;try{const c=await createUserWithEmailAndPassword(auth,ph+DOM,pw);U=c.user;await mk(n,sn,ph);await load();busy=0;location.hash='#/';route()}catch(e){busy=0;toast(aerr(e))}},
  act:async()=>{const c=v('ac');if(!/^\d{4}$/.test(c))return toast('Entrez le code à 4 chiffres');try{await updateDoc(doc(db,'shops',SH.id),{status:'active',try:c});await updateDoc(doc(db,'shops',SH.id),{try:''});await load();toast('✅ Boutique activée');route()}catch(e){toast('Code incorrect')}},
  tab:k=>{tab=k;ED=null;tabRender()},
  ost:async k=>{const[id,st]=k.split('|'),o=OR.find(x=>x.id==id),p={status:st};if(st=='paid'){p.files=[];for(const i of o.items){try{const d=await getDoc(doc(db,'private',i.id));if(d.exists()&&d.data().dl)p.files.push({n:i.n,u:d.data().dl})}catch{}}}
