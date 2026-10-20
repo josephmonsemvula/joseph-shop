@@ -29,7 +29,8 @@ service cloud.firestore {
       allow get: if true;
       allow list: if adm() || (request.auth != null && resource.data.uid == request.auth.uid);
       allow create: if request.resource.data.status == 'new' && shopOf(request.resource.data.slug).status == 'active' && request.resource.data.uid == shopOf(request.resource.data.slug).uid;
-      allow update: if adm() || (me(resource.data.uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','files']));
+      allow update: if adm() || (me(resource.data.uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','files']))
+        || (resource.data.status == 'new' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ref']));
       allow delete: if adm();
     }
     match /codes/{c} { allow read, write: if adm(); }
