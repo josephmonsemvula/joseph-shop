@@ -1,0 +1,13 @@
+JOSSELL SHOP – 3 ÉTAPES SEULEMENT
+
+ÉTAPE 1 (Firebase, 1 minute)
+  Firestore Database > onglet "Règles" > supprimez tout > collez le contenu de ETAPE-1-REGLES-FIREBASE.txt > Publier.
+
+ÉTAPE 2 (GitHub)
+  Mettez TOUS les fichiers de ce dossier à la racine de votre dépôt (y compris .nojekyll), puis Settings > Pages > Deploy from a branch > main > /(root).
+
+ÉTAPE 3 (votre administration, tout de suite après la publication)
+  Ouvrez le lien. Touchez 10 fois le logo sans arrêter. Tapez Joseph00@.
+  (Le premier qui le fait devient l'administrateur : faites-le avant d'envoyer le lien.)
+
+Ensuite : dans l'administration, générez un code à 4 chiffres pour chaque vendeur.
