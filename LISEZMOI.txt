@@ -1,17 +1,15 @@
-JOSSELL SHOP v3  |  Conçu par Joseph Monsemvula
+JOSSELL SHOP v3.1  |  Conçu par Joseph Monsemvula
 
-MISE À JOUR (3 étapes)
+MISE À JOUR
 1) Firebase > Firestore Database > Règles : supprimez tout, collez ETAPE-1-REGLES-FIREBASE.txt, Publier.
-   (Obligatoire : les règles ont changé, la boutique s'ouvre maintenant sans code d'autorisation.)
+   (L'administration peut aussi vous les copier : Administration > Paramètres > Copier les règles.)
 2) GitHub : remplacez index.html et sw.js (gardez les autres fichiers, y compris .nojekyll).
 3) Rouvrez l'application après 1 à 2 minutes.
 
-NOUVEAUTÉS
-- Ouverture de boutique immédiate, sans autorisation. Seule la commission de 10 % reste due.
-- Le vendeur reste connecté. Verrouillage facultatif dans Boutique > Paramètres.
-- Paiement en deux temps : commande, choix du moyen de paiement, puis « J'ai payé » (sans référence).
-- Notifications de l'administrateur visibles seulement chez le propriétaire de la boutique (cloche).
-- Nettoyage des commandes servies ou annulées avec deux avertissements (les commissions restent comptées).
-- Interface adaptée téléphone, tablette et ordinateur. Boutons de retour intégrés.
+ADMINISTRATION (espace séparé, design sombre)
+- Appuyez 10 fois de suite sur le logo (accueil, connexion ou inscription), puis tapez le code secret.
+- Sections : Tableau de bord, Boutiques, Commissions, Notifications, Messages, Paramètres.
 
-ADMINISTRATION : onglet Boutique > 10 appuis rapides sur le logo > code secret.
+INSCRIPTION DES VENDEURS
+- 4 champs : nom complet, nom de la boutique, téléphone, mot de passe (4 caractères minimum, sans répétition).
+- Connexion immédiate, sans autorisation. Seule la commission de 10 % reste due.
