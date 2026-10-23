@@ -7,13 +7,11 @@ service cloud.firestore {
 
     match /shops/{s} {
       allow read: if true;
-      allow create: if me(request.resource.data.uid) && request.resource.data.status == 'pending' && request.resource.data.cpaid == 0;
+      allow create: if me(request.resource.data.uid) && request.resource.data.status == 'active' && request.resource.data.cpaid == 0;
       allow update: if adm() || (me(resource.data.uid)
         && request.resource.data.uid == resource.data.uid
         && request.resource.data.cpaid == resource.data.cpaid
-        && (request.resource.data.status == resource.data.status
-            || (resource.data.status == 'pending' && request.resource.data.status == 'active'
-                && request.resource.data.get('try', '') == get(/databases/$(database)/documents/codes/$(resource.data.ph9)).data.code)));
+        && request.resource.data.status == resource.data.status);
       allow delete: if adm();
     }
     match /products/{p} {
@@ -29,10 +27,20 @@ service cloud.firestore {
       allow get: if true;
       allow list: if adm() || (request.auth != null && resource.data.uid == request.auth.uid);
       allow create: if request.resource.data.status == 'new' && shopOf(request.resource.data.slug).status == 'active' && request.resource.data.uid == shopOf(request.resource.data.slug).uid;
-      allow update: if adm() || (me(resource.data.uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','files']))
-        || (resource.data.status == 'new' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ref']));
+      allow update: if adm()
+        || (me(resource.data.uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','files','hid']))
+        || (resource.data.status == 'new' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claim','pm']));
       allow delete: if adm();
     }
-    match /codes/{c} { allow read, write: if adm(); }
+    match /notifs/{n} {
+      allow create, delete: if adm();
+      allow read: if adm() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow update: if adm() || (me(resource.data.uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']));
+    }
+    match /msgs/{m} {
+      allow create: if me(request.resource.data.uid);
+      allow read: if adm() || me(resource.data.uid);
+      allow update, delete: if adm();
+    }
   }
 }

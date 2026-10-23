@@ -1,13 +1,17 @@
-JOSSELL SHOP – 3 ÉTAPES SEULEMENT
+JOSSELL SHOP v3  |  Conçu par Joseph Monsemvula
 
-ÉTAPE 1 (Firebase, 1 minute)
-  Firestore Database > onglet "Règles" > supprimez tout > collez le contenu de ETAPE-1-REGLES-FIREBASE.txt > Publier.
+MISE À JOUR (3 étapes)
+1) Firebase > Firestore Database > Règles : supprimez tout, collez ETAPE-1-REGLES-FIREBASE.txt, Publier.
+   (Obligatoire : les règles ont changé, la boutique s'ouvre maintenant sans code d'autorisation.)
+2) GitHub : remplacez index.html et sw.js (gardez les autres fichiers, y compris .nojekyll).
+3) Rouvrez l'application après 1 à 2 minutes.
 
-ÉTAPE 2 (GitHub)
-  Mettez TOUS les fichiers de ce dossier à la racine de votre dépôt (y compris .nojekyll), puis Settings > Pages > Deploy from a branch > main > /(root).
+NOUVEAUTÉS
+- Ouverture de boutique immédiate, sans autorisation. Seule la commission de 10 % reste due.
+- Le vendeur reste connecté. Verrouillage facultatif dans Boutique > Paramètres.
+- Paiement en deux temps : commande, choix du moyen de paiement, puis « J'ai payé » (sans référence).
+- Notifications de l'administrateur visibles seulement chez le propriétaire de la boutique (cloche).
+- Nettoyage des commandes servies ou annulées avec deux avertissements (les commissions restent comptées).
+- Interface adaptée téléphone, tablette et ordinateur. Boutons de retour intégrés.
 
-ÉTAPE 3 (votre administration, tout de suite après la publication)
-  Ouvrez le lien. Touchez 10 fois le logo sans arrêter. Tapez Joseph00@.
-  (Le premier qui le fait devient l'administrateur : faites-le avant d'envoyer le lien.)
-
-Ensuite : dans l'administration, générez un code à 4 chiffres pour chaque vendeur.
+ADMINISTRATION : onglet Boutique > 10 appuis rapides sur le logo > code secret.
